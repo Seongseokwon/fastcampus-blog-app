@@ -1,7 +1,12 @@
-export default function PostNew() {
+import Footer from "../../components/layouts/Footer";
+import Header from "../../components/layouts/Header";
+
+export default function PostNewPage() {
   return (
-    <div>
-      <h1>Post Detail</h1>
-    </div>
+    <>
+     <Header />
+     <div>Post Form</div>
+     <Footer /> 
+    </>
   )
 }
