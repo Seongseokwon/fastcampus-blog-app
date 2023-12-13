@@ -1,7 +1,11 @@
+import Header from "components/layouts/Header";
+import PostForm from "components/post/PostForm";
+
 export default function PostEditPage() {
   return (
-    <div>
-      <h1>Post Detail</h1>
-    </div>
+    <>
+      <Header />
+      <PostForm />
+    </>
   )
 }
