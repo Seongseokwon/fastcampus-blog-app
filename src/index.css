@@ -303,3 +303,7 @@ footer a:hover {
 .form__link:focus {
   color: black;
 }
+
+.form__error {
+  color: red;
+}
