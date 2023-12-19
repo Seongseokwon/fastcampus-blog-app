@@ -81,7 +81,7 @@ const LoginForm = () => {
 
       {error && error.length > 0 && (
         <div className="form__block">
-          <div className="form_-error">{error}</div>
+          <div className="form__error">{error}</div>
         </div>
       )}
 
