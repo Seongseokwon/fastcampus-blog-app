@@ -76,7 +76,6 @@ const PostForm = () => {
     }
   }, [post])
 
-  console.log(post);
   return (
     <form className="form" onSubmit={onSubmit}>
       <div className="form__block">
