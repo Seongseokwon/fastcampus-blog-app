@@ -1,5 +1,13 @@
 import AuthContext from "context/AuthContext";
-import { collection, deleteDoc, doc, getDocs } from "firebase/firestore";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
 import { db } from "firebaseApp";
 import React, { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -7,6 +15,7 @@ import { toast } from "react-toastify";
 
 interface PostListProps {
   hasNavigation?: boolean;
+  defaultTab?: TabType;
 }
 
 type TabType = "all" | "my";
@@ -21,15 +30,28 @@ export interface PostProps {
   uid: string;
   email: string;
 }
-const PostList = ({ hasNavigation = true }: PostListProps) => {
-  const [activeTab, setActiveTab] = useState<TabType>("all");
+const PostList = ({
+  hasNavigation = true,
+  defaultTab = "all",
+}: PostListProps) => {
+  const [activeTab, setActiveTab] = useState<TabType>(defaultTab);
   const [posts, setPosts] = useState<any>([]);
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const getPosts = async () => {
-    const datas = await getDocs(collection(db, "posts"));
     setPosts([]);
+    const postRef = collection(db, "posts");
+    let postQuery = query(postRef, orderBy("createdAt", "desc"));
+
+    if (activeTab === "my" && user) {
+      postQuery = query(
+        postRef,
+        where("uid", "==", user.uid),
+        orderBy("createdAt", "desc")
+      );
+    }
+    const datas = await getDocs(postQuery);
     datas.forEach((doc) => {
       const dataObj = { ...doc.data(), id: doc.id };
       setPosts((prev: PostProps[]) => [...prev, dataObj as PostProps]);
@@ -37,19 +59,18 @@ const PostList = ({ hasNavigation = true }: PostListProps) => {
   };
 
   const handleDelete = async (id: string) => {
-    const confirm = window.confirm('해당 게시글을 삭제하시겠습니까?');
-    if(confirm && id) {
-      await deleteDoc(doc(db, 'posts', id));
-      toast.success('게시글을 삭제했습니다.');
+    const confirm = window.confirm("해당 게시글을 삭제하시겠습니까?");
+    if (confirm && id) {
+      await deleteDoc(doc(db, "posts", id));
+      toast.success("게시글을 삭제했습니다.");
       getPosts();
     }
-  }
+  };
 
   useEffect(() => {
     getPosts();
-  }, []);
+  }, [activeTab]);
 
-  console.log(posts);
   return (
     <>
       {hasNavigation && (
@@ -86,7 +107,13 @@ const PostList = ({ hasNavigation = true }: PostListProps) => {
               </Link>
               {post.email === user?.email ? (
                 <div className="post__utils-box">
-                  <div role='presentation' className="post__delete" onClick={() => handleDelete(post?.id as string)}>삭제</div>
+                  <div
+                    role="presentation"
+                    className="post__delete"
+                    onClick={() => handleDelete(post?.id as string)}
+                  >
+                    삭제
+                  </div>
                   <div className="post__edit">
                     <Link to={`posts/edit/${post.id}`}>수정</Link>
                   </div>
@@ -97,7 +124,7 @@ const PostList = ({ hasNavigation = true }: PostListProps) => {
             </div>
           ))
         ) : (
-          <div className='post__no-post'>게시글이 없습니다.</div>
+          <div className="post__no-post">게시글이 없습니다.</div>
         )}
       </div>
     </>

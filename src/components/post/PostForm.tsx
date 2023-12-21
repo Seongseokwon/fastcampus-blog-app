@@ -6,7 +6,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { PostProps } from "./PostList";
 
-
 const PostForm = () => {
   const { user } = useContext(AuthContext);
   const { id } = useParams();
@@ -22,28 +21,36 @@ const PostForm = () => {
     e.preventDefault();
     try {
       if (post && post.id) {
-        const postRef = doc(db, 'posts', post.id);
-        const {title, content, summary} = postData;
+        const postRef = doc(db, "posts", post.id);
+        const { title, content, summary } = postData;
         await updateDoc(postRef, {
           title,
           summary,
           content,
-          updatedAt: new Date().toLocaleDateString(),
-          uid: user?.uid
+          updatedAt: new Date().toLocaleDateString("ko", {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+          }),
+          uid: user?.uid,
         });
-        toast.success('게시글을 수정했습니다.');
+        toast.success("게시글을 수정했습니다.");
         navigate(`/posts/${post.id}`);
       } else {
-        await addDoc(collection(db, 'posts'), {
+        await addDoc(collection(db, "posts"), {
           ...postData,
-          createAt: new Date()?.toLocaleDateString(),
-          email: user?.email
+          createdAt: new Date()?.toLocaleDateString("ko", {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+          }),
+          email: user?.email,
         });
-        toast.success('게시글을 생성했습니다.');
-        navigate('/');
+        toast.success("게시글을 생성했습니다.");
+        navigate("/");
       }
     } catch (err: any) {
-      toast.error('게시글 생성을 실패했습니다.');
+      toast.error("게시글 생성을 실패했습니다.");
       console.log(err);
     }
   };
@@ -59,22 +66,22 @@ const PostForm = () => {
   };
 
   const getPost = async (id: string) => {
-    const docRef = doc(db, 'posts', id);
+    const docRef = doc(db, "posts", id);
     const docSnap = await getDoc(docRef);
 
-    setPost({id: docSnap.id, ...docSnap.data() as PostProps});
-  }
+    setPost({ id: docSnap.id, ...(docSnap.data() as PostProps) });
+  };
 
   useEffect(() => {
     if (id) getPost(id);
-  }, [id])
+  }, [id]);
 
   useEffect(() => {
-    if(post) {
-      const {title, summary, content} = post;
-      setPostData((prev) => ({...prev, title, summary, content}))
+    if (post) {
+      const { title, summary, content } = post;
+      setPostData((prev) => ({ ...prev, title, summary, content }));
     }
-  }, [post])
+  }, [post]);
 
   return (
     <form className="form" onSubmit={onSubmit}>
@@ -111,7 +118,11 @@ const PostForm = () => {
         ></textarea>
       </div>
       <div className="form__block">
-        <input type="submit" value={post ? '수정' : '제출'} className="form__btn--submit" />
+        <input
+          type="submit"
+          value={post ? "수정" : "제출"}
+          className="form__btn--submit"
+        />
       </div>
     </form>
   );
