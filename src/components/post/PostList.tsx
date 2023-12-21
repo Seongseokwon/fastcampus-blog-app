@@ -18,8 +18,6 @@ interface PostListProps {
   defaultTab?: TabType;
 }
 
-type TabType = "all" | "my";
-
 export interface PostProps {
   id?: string;
   title: string;
@@ -29,7 +27,14 @@ export interface PostProps {
   updatedAt: string;
   uid: string;
   email: string;
+  category: CategoryType;
 }
+
+type TabType = "all" | "my";
+export type CategoryType = 'Frontend' | 'Backend' | 'Web' | 'Native';
+export const CATEGORIES: CategoryType[] = ['Frontend', 'Backend', 'Web', 'Native']
+
+
 const PostList = ({
   hasNavigation = true,
   defaultTab = "all",

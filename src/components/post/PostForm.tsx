@@ -4,15 +4,21 @@ import { db } from "firebaseApp";
 import AuthContext from "context/AuthContext";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { PostProps } from "./PostList";
+import { CATEGORIES, CategoryType, PostProps } from "./PostList";
 
 const PostForm = () => {
   const { user } = useContext(AuthContext);
   const { id } = useParams();
   const navigate = useNavigate();
   const [post, setPost] = useState<PostProps | null>(null);
-  const [postData, setPostData] = useState({
+  const [postData, setPostData] = useState<{
+    title: string;
+    category: CategoryType | string;
+    summary: string;
+    content: string;
+  }>({
     title: "",
+    category: '',
     summary: "",
     content: "",
   });
@@ -20,9 +26,9 @@ const PostForm = () => {
   const onSubmit = async (e: React.FocusEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
+      const { title, content, summary, category } = postData;
       if (post && post.id) {
         const postRef = doc(db, "posts", post.id);
-        const { title, content, summary } = postData;
         await updateDoc(postRef, {
           title,
           summary,
@@ -33,6 +39,7 @@ const PostForm = () => {
             second: "2-digit",
           }),
           uid: user?.uid,
+          category
         });
         toast.success("게시글을 수정했습니다.");
         navigate(`/posts/${post.id}`);
@@ -45,6 +52,7 @@ const PostForm = () => {
             second: "2-digit",
           }),
           email: user?.email,
+          category
         });
         toast.success("게시글을 생성했습니다.");
         navigate("/");
@@ -56,7 +64,9 @@ const PostForm = () => {
   };
 
   const onChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const {
       target: { name, value },
@@ -95,6 +105,18 @@ const PostForm = () => {
           onChange={onChange}
           value={postData.title}
         />
+      </div>
+      <div className="form__block">
+        <label htmlFor="category">카테고리</label>
+        <select
+          name="category"
+          id="category"
+          onChange={onChange}
+          defaultValue={postData.category}
+        >
+          <option value=''>카테고리를 선택해주세요</option>
+          {CATEGORIES.map((category) => (<option value={category} key={category}>{category}</option>))}
+        </select>
       </div>
       <div className="form__block">
         <label htmlFor="summary">요약</label>
