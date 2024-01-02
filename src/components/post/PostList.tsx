@@ -31,15 +31,21 @@ export interface PostProps {
 }
 
 type TabType = "all" | "my";
-export type CategoryType = 'Frontend' | 'Backend' | 'Web' | 'Native';
-export const CATEGORIES: CategoryType[] = ['Frontend', 'Backend', 'Web', 'Native']
-
+export type CategoryType = "Frontend" | "Backend" | "Web" | "Native";
+export const CATEGORIES: CategoryType[] = [
+  "Frontend",
+  "Backend",
+  "Web",
+  "Native",
+];
 
 const PostList = ({
   hasNavigation = true,
   defaultTab = "all",
 }: PostListProps) => {
-  const [activeTab, setActiveTab] = useState<TabType>(defaultTab);
+  const [activeTab, setActiveTab] = useState<TabType | CategoryType>(
+    defaultTab
+  );
   const [posts, setPosts] = useState<any>([]);
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -53,6 +59,12 @@ const PostList = ({
       postQuery = query(
         postRef,
         where("uid", "==", user.uid),
+        orderBy("createdAt", "desc")
+      );
+    } else if (activeTab !== "all") {
+      postQuery = query(
+        postRef,
+        where("category", "==", activeTab),
         orderBy("createdAt", "desc")
       );
     }
@@ -94,6 +106,18 @@ const PostList = ({
           >
             나의 글
           </div>
+          {CATEGORIES.map((category) => (
+            <div
+              key={category}
+              role="presentation"
+              onClick={() => setActiveTab(category)}
+              className={
+                activeTab === category ? "post__navigation--active" : ""
+              }
+            >
+              {category}
+            </div>
+          ))}
         </nav>
       )}
 

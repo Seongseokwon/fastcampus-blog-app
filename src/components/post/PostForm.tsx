@@ -52,6 +52,7 @@ const PostForm = () => {
             second: "2-digit",
           }),
           email: user?.email,
+          uid: user?.uid,
           category
         });
         toast.success("게시글을 생성했습니다.");
