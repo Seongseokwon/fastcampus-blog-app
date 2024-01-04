@@ -64,6 +64,12 @@ footer a:hover {
   color: black;
 }
 
+.footer__theme-btn {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+}
+
 /* post navigation */
 .post__navigation {
   display: flex;
@@ -352,4 +358,22 @@ footer a:hover {
   border: 5px solid #2563eb;
   border-radius: 50%;
   z-index: 9999;
+}
+
+.white {
+  transition: all 0.25s linear;
+  background-color: white;
+}
+
+.dark {
+  transition: all 0.25s linear;
+  background-color: #1e2937;
+}
+
+.dark a,
+.dark .form label, 
+.dark .form__delete,
+.dark .form__logout,
+.dark .form__title{
+  color: white;
 }
